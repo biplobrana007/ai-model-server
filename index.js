@@ -24,7 +24,13 @@ async function run() {
   try {
     await client.connect();
 
+    const db = client.db("aimodel-db");
+    const modelCollections = db.collection("models");
 
+    app.get("/models", async (req, res) => {
+      const result = await modelCollections.find().toArray();
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
