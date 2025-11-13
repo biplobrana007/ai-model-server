@@ -73,6 +73,17 @@ async function run() {
       res.send({ success: true, result });
     });
 
+    // latest models
+    app.get("/latest-models", async (req, res) => {
+      const result = await modelCollections
+        .find()
+        .sort({ createdAt: "desc" })
+        .limit(6)
+        .toArray();
+      console.log(result);
+      res.send({ success: true, result });
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
