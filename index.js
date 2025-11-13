@@ -80,8 +80,18 @@ async function run() {
         .sort({ createdAt: "desc" })
         .limit(6)
         .toArray();
-      console.log(result);
+
       res.send({ success: true, result });
+    });
+
+    // my models
+    app.get("/my-models", async (req, res) => {
+      const email = req.query.email;
+      const result = await modelCollections
+        .find({ createdBy: email })
+        .toArray();
+
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
