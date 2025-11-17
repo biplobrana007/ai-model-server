@@ -26,6 +26,8 @@ async function run() {
 
     const db = client.db("aimodel-db");
     const modelCollections = db.collection("models");
+    const purchasedCollections = db.collection("purchased-models");
+
     //get models
     app.get("/models", async (req, res) => {
       const result = await modelCollections.find().toArray();
@@ -93,6 +95,33 @@ async function run() {
 
       res.send(result);
     });
+
+    // purchase model post
+    app.post("/purchased-models/:id", async (req, res) => {
+      const data = req.body;
+      const id = req.params.id;
+      const result = await purchasedCollections.insertOne(data);
+      const filter = { _id: new ObjectId(id) };
+      const update = {
+        $inc: {
+          purchased: 1,
+        },
+      };
+      const purchasedCounted = await modelCollections.updateOne(filter, update);
+      res.send(result, purchasedCounted);
+    });
+
+    // get purchased
+
+    app.get("/my-purchased-models", async (req, res) => {
+      const email = req.query.email;
+      const result = await purchasedCollections
+        .find({ purchasedBy: email })
+        .toArray();
+
+      res.send(result);
+    });
+
 
     await client.db("admin").command({ ping: 1 });
     console.log(
