@@ -11,7 +11,6 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@aimodelcluster.xnrsyug.mongodb.net/?appName=AiModelCluster`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -22,7 +21,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const db = client.db("aimodel-db");
     const modelCollections = db.collection("models");
@@ -38,19 +37,14 @@ async function run() {
     app.post("/models", async (req, res) => {
       const data = req.body;
       const result = await modelCollections.insertOne(data);
-      res.send({
-        success: true,
-      });
+      res.send(result);
     });
 
     //show model details
     app.get("/models/:id", async (req, res) => {
       const { id } = req.params;
       const result = await modelCollections.findOne({ _id: new ObjectId(id) });
-      res.send({
-        success: true,
-        result,
-      });
+      res.send(result);
     });
 
     //update model
@@ -122,7 +116,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
